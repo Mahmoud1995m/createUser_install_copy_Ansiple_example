@@ -1,0 +1,42 @@
+---
+ - hosts: all
+   become: yes
+   tasks:
+     - name: edit host file
+       lineinfile:
+         path: /etc/hosts
+         line: "ansible.xyzcorp.com 169.168.0.1" // add this as inline string to hosts file
+     - name: install elinks
+       package:
+         name: elinks
+         state: latest
+     - name: create audit user
+       user:
+         name: xyzcorp_audit // create this user in all hosts 
+         state: present
+     - name: update motd
+       copy:
+         src: /home/ansible/motd // copy this file to target dest 
+         dest: /etc/motd
+     - name: update issue
+       copy:
+         src: /home/ansible/issue // copy this file to target dest 
+         dest: /etc/issue 
+ - hosts: network
+   become: yes
+   tasks:
+     - name: install netcat // install netcat in all network hosts
+       yum:
+         name: nmap-ncat
+         state: latest
+     - name: create network user
+       user:
+         name: xyzcorp_network // create user in network hosts
+         state: present
+ - hosts: sysadmin
+   become: yes
+   tasks:
+     - name: copy tarball
+       copy:
+         src: /home/ansible/scripts.tgz // copy this file in all sysadmin hosts
+         dest: /mnt/storage/
